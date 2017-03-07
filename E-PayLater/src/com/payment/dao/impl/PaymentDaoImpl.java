@@ -10,10 +10,13 @@ import java.util.UUID;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +30,10 @@ public class PaymentDaoImpl implements PaymentDao {
 
 	private static final String ALGORITHM = "AES";
 	private static final String TRANSFORMATION = "AES";
+	//secret key for encryption and decryption
 	private static final String key = "PAYLATERPAYLATERPAYLAT";
+	
+	private static Logger LOG = LoggerFactory.getLogger(PaymentDao.class);
 
 	@Autowired
 	private SessionFactory sessionFactory;
@@ -36,12 +42,14 @@ public class PaymentDaoImpl implements PaymentDao {
 		this.sessionFactory = sessionFactory;
 	}
 
+	//retrieve user by token
 	@Transactional
 	public User getUserByToken(String token) {
 		User user = null;
 		try {
 			Session session = sessionFactory.openSession();
 			session.beginTransaction();
+			//decrypt the token
 			token = new String(doCrypto(Cipher.DECRYPT_MODE, key, null, token));
 			Query query = session.createQuery("FROM User WHERE token = :token");
 			query.setParameter("token", token);
@@ -49,33 +57,36 @@ public class PaymentDaoImpl implements PaymentDao {
 			session.getTransaction().commit();
 			session.close();
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			LOG.error("Exception Occured while retrieving user from token: "+token);
 		}
 		return user;
 	}
 
+	//save user generating unique UUID as token
 	@Transactional
 	public String saveUser(User user) {
 		String authToken = null;
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
+		//ensuring unique key in return
 		String token = UUID.randomUUID().toString();
 		user.setToken(token);
 
 		// user.getTransactions().add(transactions);
 		try {
+			//token generated and encrypted with secret key
 			authToken = new String(doCrypto(Cipher.ENCRYPT_MODE, key, token.getBytes(), null));
-			Integer personId = (Integer) session.save(user);
-			System.out.println("User created with Id : " + personId);
+			Integer userId = (Integer) session.save(user);
+			LOG.info("User created with Id : " + userId);
 		} catch (Exception e) {
-			System.out.println("Exception occured while creating user: " + e.getMessage());
+			LOG.error("Exception occured while creating user: " + e.getMessage());
 		} finally {
 			session.getTransaction().commit();
 			session.close();
 		}
 		return authToken;
 	}
-
+	//return balance of user using the token
 	@Transactional
 	public User getBalance(String token) {
 		User user = null;
@@ -83,12 +94,12 @@ public class PaymentDaoImpl implements PaymentDao {
 			user = getUserByToken(token);
 			return user != null ? user : null;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Exception occured while retrieving balance for token: "+token+""+e.getMessage());
 		}
 		return null;
 	}
 
+	// to retrieve the transactions of the user 
 	@Transactional
 	public List<Transactions> getTransactions(String token) {
 		List<Transactions> list =null;
@@ -101,7 +112,7 @@ public class PaymentDaoImpl implements PaymentDao {
 			query.setParameter("userId", user.getId());
 			list = query.list();
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception occured: "+e.getMessage());
 		}finally{
 			session.getTransaction().commit();
 			session.close();
@@ -109,6 +120,7 @@ public class PaymentDaoImpl implements PaymentDao {
 		return list;
 	}
 
+	//encrypting the token with algorith AES and secret key
 	private static String doCrypto(int cipherMode, String key, byte[] inputBytes, String decodeText) {
 		try {
 			if (cipherMode == Cipher.DECRYPT_MODE) {
@@ -116,7 +128,7 @@ public class PaymentDaoImpl implements PaymentDao {
 				Key secretKey = new SecretKeySpec(raw, ALGORITHM);
 				Cipher cipher = Cipher.getInstance(TRANSFORMATION);
 				byte[] encryptText = Base64.decodeBase64(decodeText);
-				cipher = Cipher.getInstance("AES");
+				cipher = Cipher.getInstance(ALGORITHM);
 				cipher.init(Cipher.DECRYPT_MODE, secretKey);
 				return new String(cipher.doFinal(encryptText));
 
@@ -137,23 +149,6 @@ public class PaymentDaoImpl implements PaymentDao {
 	}
 
 	@Override
-	public Long getBalance1() {
-		User user;
-		try {
-			Session session = sessionFactory.openSession();
-			session.beginTransaction();
-
-			Query query = session.createQuery("FROM User ");
-			user = (User) query.list().get(0);
-			session.getTransaction().commit();
-			session.close();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-		return 100L;
-	}
-
-	@Override
 	public Integer UserCount() {
 		// TODO Auto-generated method stub
 		return null;
@@ -165,15 +160,15 @@ public class PaymentDaoImpl implements PaymentDao {
 		return null;
 	}
 
+	//to save transaction done by user
 	@Override
 	public void saveTransactions(Transactions transactions) {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		try {
 			session.persist(transactions);
-			System.out.println("transaction created  ");
 		} catch (Exception e) {
-			System.out.println("Exception occured while creating user: " + e.getMessage());
+			LOG.error("Exception occured while creating user: " + e.getMessage());
 		} finally {
 			session.getTransaction().commit();
 			session.close();

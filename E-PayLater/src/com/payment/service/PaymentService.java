@@ -9,13 +9,7 @@ import com.payment.entity.User;
 
 public interface PaymentService {
 	Authentication createUser();
-
 	User getBalance(String token);
-
 	List<Transactions> getTransactions(String token);
-
 	void addTransaction(String token, Transactions transaction);
-
-	Long getBalance1();
-	
 }

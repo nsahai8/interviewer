@@ -12,6 +12,5 @@ public interface PaymentDao {
 	List<Transactions> getTransactions(String token);
 	User getUserByToken(String token);
 	String extractToken(String encryptedText) throws Exception;
-	Long getBalance1();
 	void saveTransactions(Transactions transactions);
 }

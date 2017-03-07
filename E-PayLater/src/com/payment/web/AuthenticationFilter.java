@@ -9,6 +9,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,8 +25,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 	@Autowired
 	PaymentDao paymentDao;
 	
-	private TokenAuthenticationProvider tokenAuthenticationProvider;
-
+	private static Logger LOG = LoggerFactory.getLogger(AuthenticationFilter.class);
+	
     @Override
     protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response, FilterChain filterChain)
@@ -35,7 +37,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         if(xAuth != null){
         	
     		// header value format will be "Basic encodedstring" for Basic
-    		// authentication. Example "Basic YWRtaW46YWRtaW4="
+    		// authentication. 
     		final String encodedUserToken = xAuth.replaceFirst("Basic"
     				+ " ", "");
     		String userToken = null;
@@ -53,9 +55,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     		authentication = new UsernamePasswordAuthenticationToken(userAuthToken ,userId);
     		SecurityContextHolder.getContext().setAuthentication(authentication);
-    		// we have fixed the userid and password as admin
-    		// call some UserService/LDAP here
-    		System.out.println(userAuthToken+"-----"+userId);
+    		
+    		LOG.info("Token received : "+userAuthToken);
         }
         
         filterChain.doFilter(request, response);

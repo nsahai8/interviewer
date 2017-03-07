@@ -1,8 +1,10 @@
 package com.payment.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.jasper.tagplugins.jstl.core.ForEach;
 import org.hibernate.type.TrueFalseType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -56,8 +58,12 @@ public class PaymentController {
     @ResponseBody   
     @RequestMapping(value = "/transactions", method = RequestMethod.GET)
     public List<Transactions> getTransactions() {
+    	List<Transactions> list = new ArrayList<>();
     	String token = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     	List<Transactions> transactions = paymentService.getTransactions(token);
+    	transactions.forEach(transaction->{
+    		list.add(transaction);
+    	});
     	return transactions;
     }
     

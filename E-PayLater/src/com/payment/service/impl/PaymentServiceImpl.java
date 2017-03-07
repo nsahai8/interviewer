@@ -22,6 +22,7 @@ import com.payment.service.PaymentService;
 @Service
 
 public class PaymentServiceImpl implements PaymentService {
+	
 	@Autowired
 	private PaymentDao paymentDao;
 
@@ -48,16 +49,13 @@ public class PaymentServiceImpl implements PaymentService {
 		return paymentDao.getBalance(token);
 	}
 
-	public Long getBalance1() {
-		return paymentDao.getBalance1();
-	}
 	//get List of transactions using user Id
 	@Override
 	public List<Transactions> getTransactions(String token) {
 		return paymentDao.getTransactions(token);
 	}
 
-	//addd transaction done by the user
+	//add transaction done by the user
 	@Override
 	public void addTransaction(String token, Transactions transaction) {
 		User user = paymentDao.getUserByToken(token);
