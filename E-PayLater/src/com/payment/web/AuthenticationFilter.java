@@ -46,7 +46,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     					encodedUserToken);
     			userToken = new String(decodedBytes, "UTF-8");
     		} catch (IOException e) {
-    			LOG.error("Authentication failed for token: "+authentication.getPrincipal());
+    			LOG.error("Authentication failed for token: "+xAuth);
     		}
     		final StringTokenizer tokenizer = new StringTokenizer(
     				userToken, ":");

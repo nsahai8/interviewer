@@ -13,4 +13,5 @@ public interface PaymentDao {
 	User getUserByToken(String token);
 	String extractToken(String encryptedText) throws Exception;
 	void saveTransactions(Transactions transactions);
+	void UpdateUser(User user);
 }

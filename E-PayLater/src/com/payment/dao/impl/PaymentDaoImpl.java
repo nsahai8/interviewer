@@ -1,17 +1,13 @@
 package com.payment.dao.impl;
 
 import java.security.Key;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.commons.codec.binary.Base64;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -51,6 +47,7 @@ public class PaymentDaoImpl implements PaymentDao {
 			session.beginTransaction();
 			//decrypt the token
 			token = new String(doCrypto(Cipher.DECRYPT_MODE, key, null, token));
+			System.out.println(token);
 			Query query = session.createQuery("FROM User WHERE token = :token");
 			query.setParameter("token", token);
 			user = (User) query.list().get(0);
@@ -176,6 +173,22 @@ public class PaymentDaoImpl implements PaymentDao {
 			session.close();
 		}
 
+	}
+	@Override
+	public void UpdateUser(User user) {
+		Session session =null;
+		try {
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+			session.persist(user);
+			session.getTransaction().commit();
+			
+		} catch (Exception e) {
+			LOG.error("Exception Occured while updating user: "+e.getMessage());
+		}finally{
+			session.close();
+		}
+		
 	}
 
 }
