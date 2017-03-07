@@ -21,60 +21,22 @@ import com.payment.security.AuthFailureHandler;
 import com.payment.security.AuthSuccessHandler;
 import com.payment.security.HttpAuthenticationEntryPoint;
 import com.payment.service.impl.TokenAuthenticationProvider;
-/*import com.payment.web.AuthenticationFilter;
-import com.payment.web.MDCFilter;
-*/
+import com.payment.web.AuthenticationFilter;
+
 @Configuration
 @EnableWebSecurity
-
 @ComponentScan(basePackages = { "com.payment.security" })
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-	/*@Autowired
-	private HttpAuthenticationEntryPoint authenticationEntryPoint;
-
-	@Autowired
-	private AuthSuccessHandler authSuccessHandler;
-
-	@Autowired
-	private AuthFailureHandler authFailureHandler;
-
-	
-
-	
-	private AccessDeniedHandler accessDeniedHandler;*/
 
 	@Autowired
 	TokenAuthenticationProvider tokenAuthenticationProvider;
-
-	/*@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.authenticationProvider(tokenAuthenticationProvider);
-	}*/
 
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		web.ignoring().antMatchers("/static/**").antMatchers("/js/**").antMatchers("/css/**");
 	}
 
-	/* @Override
-	public void configure(HttpSecurity http) throws Exception {
-
-		http.csrf().disable().exceptionHandling().accessDeniedHandler(accessDeniedHandler)
-				.authenticationEntryPoint(authenticationEntryPoint).and().formLogin().permitAll()
-				.loginProcessingUrl("/login").usernameParameter("username").passwordParameter("password")
-				.successHandler(authSuccessHandler).failureHandler(authFailureHandler).and().authorizeRequests()
-				.anyRequest().authenticated().and() 
-				.addFilterAfter(new MDCFilter(), UsernamePasswordAuthenticationFilter.class);
-	}*/
-	
-	/*@Override
-    protected void configure(HttpSecurity http) throws Exception {        
-         System.out.println("in Security Config");       
-        http.authorizeRequests().antMatchers("/login").authenticated().and()
-         .antMatcher("/").addFilterBefore(new AuthenticationFilter(), BasicAuthenticationFilter.class);
-    }*/
-    
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {   
     	 System.out.println("in AuthenticationManagerBuilder");

@@ -58,6 +58,8 @@ public class PaymentDaoImpl implements PaymentDao {
 			session.close();
 		} catch (Exception e) {
 			LOG.error("Exception Occured while retrieving user from token: "+token);
+		}finally{
+			
 		}
 		return user;
 	}

@@ -30,6 +30,7 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		UsernamePasswordAuthenticationToken usernamePasswordAuth = (UsernamePasswordAuthenticationToken) authentication;
 		String token = usernamePasswordAuth.getName();
+		System.out.println("In TokenAuthenticationProvider ");
 		String userId = (String) usernamePasswordAuth.getCredentials();
 		try {
 			String tokenInDB = paymentDao.extractToken(token);
