@@ -32,7 +32,7 @@
 		<hibernate.version>4.3.6.Final</hibernate.version>
 		<mysql.connector.version>5.0.4</mysql.connector.version>
 		<joda-time.version>2.3</joda-time.version>
-		<spring.security.version>4.0.2.RELEASE</spring.security.version>
+		<spring.security.version>5.4.1</spring.security.version>
 		<testng.version>6.9.4</testng.version>
 	</properties>
 
